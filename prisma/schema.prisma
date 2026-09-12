@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Settings {
+  id              String   @id @default("singleton")
+  companyName     String   @default("Likoni Logistics Ltd")
+  companyTagline  String   @default("Fuel Reseller & Transport Solutions")
+  physicalAddress String   @default("")
+  postalAddress   String   @default("")
+  phone           String   @default("")
+  email           String   @default("")
+  website         String   @default("")
+  kraPin          String   @default("")
+  vatPin          String   @default("")
+  logoPath        String?
+  vatEnabled      Boolean  @default(false)
+  vatRate         Float    @default(16)
+  paymentTerms    String   @default("CASH")
+  invoicePrefix   String   @default("LL")
+  nextSequence    Int      @default(1)
+  defaultCurrency String   @default("USD")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model BankAccount {
+  id            String    @id @default(cuid())
+  bankName      String
+  accountName   String
+  accountNumber String
+  branch        String?
+  swiftCode     String?
+  bankAddress   String?
+  currency      String    @default("KES")
+  isDefault     Boolean   @default(false)
+  invoices      Invoice[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Customer {
+  id        String    @id @default(cuid())
+  name      String
+  address   String?
+  kraPin    String?
+  email     String?
+  phone     String?
+  invoices  Invoice[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Invoice {
+  id               String       @id @default(cuid())
+  invoiceNumber    String       @unique
+  invoiceDate      DateTime     @default(now())
+  dueDate          DateTime
+  customerId       String
+  customer         Customer     @relation(fields: [customerId], references: [id])
+  customerRef      String?
+  bankAccountId    String?
+  bankAccount      BankAccount? @relation(fields: [bankAccountId], references: [id])
+  fuelType         String       // AGO | PMS
+  quantity         Float
+  unit             String       // MT | CBM
+  transType        String       // Local | Transit
+  destination      String?      // COMGO | Sudan
+  currency         String       // KES | USD
+  sellingAmount    Float        // TOTAL selling amount (customer sees this)
+  purchaseAmount   Float        @default(0) // TOTAL purchase cost (INTERNAL ONLY)
+  purchaseQuantity Float?       // may differ from selling qty
+  purchaseUnit     String?      // may differ from selling unit
+  grossProfit      Float        @default(0) // = sellingAmount - purchaseAmount (INTERNAL ONLY)
+  vatEnabled       Boolean      @default(false)
+  vatRate          Float        @default(16)
+  paymentTerms     String       @default("CASH")
+  notes            String?
+  status           String       @default("unpaid") // unpaid | paid
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}

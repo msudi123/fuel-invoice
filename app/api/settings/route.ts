@@ -9,7 +9,11 @@ async function requireAuth() {
 
 export async function GET() {
   await requireAuth();
-  const settings = await db.settings.findUniqueOrThrow({ where: { id: "singleton" } });
+  const settings = await db.settings.upsert({
+    where: { id: "singleton" },
+    update: {},
+    create: { id: "singleton" },
+  });
   return Response.json(settings);
 }
 

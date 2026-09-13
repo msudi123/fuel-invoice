@@ -3,10 +3,23 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
   renderToBuffer,
 } from "@react-pdf/renderer";
 import { calcInvoiceTotal, calcVat, fuelLabel, formatAmount } from "./calculations";
+import fs from "fs";
+import path from "path";
+
+function getLogoDataUrl(): string | null {
+  try {
+    const logoPath = path.join(process.cwd(), "public", "logo.png");
+    const data = fs.readFileSync(logoPath);
+    return `data:image/png;base64,${data.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
 
 const styles = StyleSheet.create({
   page: {
@@ -20,6 +33,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginBottom: 32,
+  },
+  logoImage: {
+    width: 64,
+    height: 64,
+    objectFit: "contain",
   },
   companyName: {
     fontSize: 18,
@@ -192,7 +210,7 @@ interface InvoiceData {
   bankAccount?: BankAccountData | null;
 }
 
-function InvoicePDF({ invoice }: { invoice: InvoiceData }) {
+function InvoicePDF({ invoice, logoDataUrl }: { invoice: InvoiceData; logoDataUrl: string | null }) {
   const vat = calcVat(invoice.sellingAmount, invoice.vatEnabled ? invoice.vatRate : 0);
   const total = calcInvoiceTotal(invoice.sellingAmount, invoice.vatEnabled, invoice.vatRate);
   const fmt = (n: number) => formatAmount(n, invoice.currency);
@@ -204,9 +222,14 @@ function InvoicePDF({ invoice }: { invoice: InvoiceData }) {
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.companyName}>Likoni Logistics Ltd</Text>
-            <Text style={styles.companyTagline}>Fuel Reseller & Transport Solutions</Text>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            {logoDataUrl ? (
+              <Image src={logoDataUrl} style={styles.logoImage} />
+            ) : null}
+            <View>
+              <Text style={styles.companyName}>Likoni Logistics Ltd</Text>
+              <Text style={styles.companyTagline}>Fuel Reseller & Transport Solutions</Text>
+            </View>
           </View>
           <View>
             <Text style={styles.invoiceLabel}>INVOICE</Text>
@@ -331,6 +354,7 @@ function InvoicePDF({ invoice }: { invoice: InvoiceData }) {
 }
 
 export async function generateInvoicePDF(invoice: InvoiceData): Promise<Buffer> {
-  const buffer = await renderToBuffer(<InvoicePDF invoice={invoice} />);
+  const logoDataUrl = getLogoDataUrl();
+  const buffer = await renderToBuffer(<InvoicePDF invoice={invoice} logoDataUrl={logoDataUrl} />);
   return buffer;
 }

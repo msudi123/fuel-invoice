@@ -18,6 +18,8 @@ model Settings {
   website         String   @default("")
   kraPin          String   @default("")
   vatPin          String   @default("")
+  epraLicense     String   @default("")
+  logoUrl         String?
   logoPath        String?
   vatEnabled      Boolean  @default(false)
   vatRate         Float    @default(16)

@@ -4,6 +4,7 @@ import { formatAmount, calcInvoiceTotal, calcVat, fuelLabel } from "@/lib/calcul
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import InvoiceActions from "./InvoiceActions";
+import NavBar from "@/components/NavBar";
 
 export default async function InvoicePage({
   params,
@@ -31,6 +32,8 @@ export default async function InvoicePage({
   const fmt = (n: number) => formatAmount(n, invoice.currency);
 
   return (
+    <>
+    <NavBar />
     <div className="max-w-3xl mx-auto px-4 py-8">
       <div className="flex items-center gap-3 mb-6">
         <Link href="/" className="text-gray-400 hover:text-gray-600">
@@ -144,5 +147,6 @@ export default async function InvoicePage({
         )}
       </div>
     </div>
+    </>
   );
 }

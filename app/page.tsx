@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { formatAmount, calcInvoiceTotal } from "@/lib/calculations";
-import { Plus, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Plus, FileText } from "lucide-react";
+import NavBar from "@/components/NavBar";
 
 export default async function DashboardPage() {
   const invoices = await db.invoice.findMany({
@@ -24,7 +25,9 @@ export default async function DashboardPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
+    <>
+    <NavBar />
+    <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -110,5 +113,6 @@ export default async function DashboardPage() {
         )}
       </div>
     </div>
+    </>
   );
 }

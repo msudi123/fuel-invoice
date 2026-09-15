@@ -198,7 +198,7 @@ export default function NewInvoicePage() {
                   <label className={labelCls}>Destination</label>
                   <select value={destination} onChange={(e) => setDestination(e.target.value)} className={inputCls}>
                     <option value="">— Select —</option>
-                    <option value="COMGO">COMGO</option>
+                    <option value="Congo">Congo</option>
                     <option value="Sudan">Sudan</option>
                     <option value="Uganda">Uganda</option>
                     <option value="Rwanda">Rwanda</option>
